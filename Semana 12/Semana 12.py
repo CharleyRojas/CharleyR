@@ -119,36 +119,35 @@ temperaturas = [
     ]
 ]
 
-# Calcular el promedio de temperaturas para cada ciudad y semana
+def calcular_promedio_ciudades(temperaturas_data, nombres_ciudades):
+
+    promedios = {}
+
+    for i in range(len(nombres_ciudades)):
+        total_temp = 0
+        total_dias = 0
+
+        # Recorrer todas las semanas y días de la ciudad
+        for semana in temperaturas_data[i]:
+            for dia in semana:
+                total_temp += dia["temp"]
+                total_dias += 1
+
+        # Calcular el promedio
+        promedio = total_temp / total_dias
+        promedios[nombres_ciudades[i]] = round(promedio, 1)
+
+    return promedios
+
+
+# Lista de nombres de ciudades
 ciudades = ["Madrid", "Barcelona", "Sevilla"]
 
-print("ANÁLISIS DE TEMPERATURAS POR CIUDAD Y SEMANA")
-print("=" * 50)
+# Usar la función
+resultados = calcular_promedio_ciudades(temperaturas, ciudades)
 
-for ciudad_idx, ciudad in enumerate(temperaturas):
-    print(f"\n{ciudades[ciudad_idx]}:")
-    print("-" * 30)
-
-    for semana_idx, semana in enumerate(ciudad):
-        suma_temperaturas = sum([dia["temp"] for dia in semana])
-        promedio = suma_temperaturas / len(semana)
-        print(f"Semana {semana_idx + 1}: {promedio:.1f}°C")
-
-# Mostrar también la temperatura más alta y más baja de cada ciudad
-print("\n" + "=" * 50)
-print("TEMPERATURAS EXTREMAS POR CIUDAD")
-print("=" * 50)
-
-for ciudad_idx, ciudad in enumerate(temperaturas):
-    todas_temperaturas = []
-    for semana in ciudad:
-        for dia in semana:
-            todas_temperaturas.append(dia["temp"])
-
-    max_temp = max(todas_temperaturas)
-    min_temp = min(todas_temperaturas)
-
-    print(f"{ciudades[ciudad_idx]}:")
-    print(f"  Máxima: {max_temp}°C")
-    print(f"  Mínima: {min_temp}°C")
-    print()
+# Mostrar resultados
+print("PROMEDIO DE TEMPERATURAS POR CIUDAD")
+print("=" * 35)
+for ciudad, promedio in resultados.items():
+    print(f"{ciudad}: {promedio}°C")
