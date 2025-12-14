@@ -1,0 +1,7 @@
+| Característica   | Tradicional | POO                |
+| ---------------- | ----------- | ------------------ |
+| Uso de funciones | ✔           | ✔                 |
+| Uso de clases    | ❌          | ✔                 |
+| Encapsulamiento  | ❌          | ✔                 |
+| Escalabilidad    | Media       | Alta               |
+| Organización     | Básica      | Mejor estructurada |
