@@ -1,6 +1,5 @@
-# ===============================
 # Clase base: Empleado
-# ===============================
+# ...........................
 class Empleado:
     def __init__(self, nombre, salario):
         # Atributos públicos
@@ -28,9 +27,8 @@ class Empleado:
         print(f"Empleado: {self.nombre}, Salario: {self.get_salario()}")
 
 
-# ===============================
 # Clase derivada: EmpleadoTiempoCompleto
-# ===============================
+# ............................
 class EmpleadoTiempoCompleto(Empleado):
     def __init__(self, nombre, salario, bono):
         # Llamada al constructor de la clase base (Herencia)
@@ -46,9 +44,8 @@ class EmpleadoTiempoCompleto(Empleado):
               f"Salario Total: {self.calcular_salario()}")
 
 
-# ===============================
 # Programa principal
-# ===============================
+# ..........................
 if __name__ == "__main__":
     # Crear objeto de la clase base
     empleado1 = Empleado("Carlos", 500)
