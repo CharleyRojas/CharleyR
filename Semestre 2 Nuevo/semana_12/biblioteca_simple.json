@@ -1,0 +1,16 @@
+{
+    "libros": [
+        {
+            "titulo": "harry potter ",
+            "autor": "nose",
+            "categoria": "magia"
+        }
+    ],
+    "usuarios": [
+        {
+            "nombre": "charley",
+            "id_usuario": "04102005",
+            "libros_prestados": []
+        }
+    ]
+}
