@@ -27,12 +27,12 @@
     &quot;assignee&quot;: &quot;CharleyRojas&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/CharleyRojas/CharleyR.git",
-    "accountId": "f415a14c-aff0-4292-bee0-64f531145721"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/CharleyRojas/CharleyR.git&quot;,
+    &quot;accountId&quot;: &quot;f415a14c-aff0-4292-bee0-64f531145721&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -63,6 +63,7 @@
     "Python.Semana5.executor": "Run",
     "Python.ejemplo.executor": "Run",
     "Python.gestion.executor": "Run",
+    "Python.semana 14.executor": "Run",
     "Python.semana 2.executor": "Run",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -127,6 +128,7 @@
       <workItem from="1772293096113" duration="1366000" />
       <workItem from="1773004141947" duration="2644000" />
       <workItem from="1773615165668" duration="592000" />
+      <workItem from="1774230376275" duration="622000" />
     </task>
     <task id="LOCAL-00001" summary="Semana 2">
       <option name="closed" value="true" />
@@ -240,7 +242,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773615313431</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Semana 13">
+      <option name="closed" value="true" />
+      <created>1774230663276</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1774230663276</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -285,6 +295,7 @@
     <SUITE FILE_PATH="coverage/CharleyR$Semana_4.coverage" NAME="Semana 4 Coverage Results" MODIFIED="1766349321109" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana 4" />
     <SUITE FILE_PATH="coverage/CharleyR$Ejermplo.coverage" NAME="Ejermplo Coverage Results" MODIFIED="1769969841979" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_7" />
     <SUITE FILE_PATH="coverage/CharleyR$Semana_13.coverage" NAME="Semana 13 Coverage Results" MODIFIED="1773615228056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_13" />
+    <SUITE FILE_PATH="coverage/CharleyR$semana_14.coverage" NAME="semana 14 Coverage Results" MODIFIED="1774230583993" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_14" />
     <SUITE FILE_PATH="coverage/CharleyR$semana_2.coverage" NAME="semana 2 Coverage Results" MODIFIED="1765163631319" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2" />
     <SUITE FILE_PATH="coverage/CharleyR$Semana12.coverage" NAME="Semana12 Coverage Results" MODIFIED="1773005853213" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/semana_12" />
     <SUITE FILE_PATH="coverage/CharleyR$Semana5.coverage" NAME="Semana5 Coverage Results" MODIFIED="1768152320101" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_5" />
