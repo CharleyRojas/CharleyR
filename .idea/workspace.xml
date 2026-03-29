@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c1fffb4-9c93-433f-9807-30280f71e0a4" name="Changes" comment="Semana 13" />
+    <list default="true" id="1c1fffb4-9c93-433f-9807-30280f71e0a4" name="Changes" comment="Semana 14" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -128,7 +128,7 @@
       <workItem from="1772293096113" duration="1366000" />
       <workItem from="1773004141947" duration="2644000" />
       <workItem from="1773615165668" duration="592000" />
-      <workItem from="1774230376275" duration="622000" />
+      <workItem from="1774230376275" duration="850000" />
     </task>
     <task id="LOCAL-00001" summary="Semana 2">
       <option name="closed" value="true" />
@@ -250,7 +250,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774230663276</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Semana 14">
+      <option name="closed" value="true" />
+      <created>1774231016365</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1774231016365</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,7 +287,8 @@
     <MESSAGE value="Semana 10" />
     <MESSAGE value="Semana 11" />
     <MESSAGE value="Semana 13" />
-    <option name="LAST_COMMIT_MESSAGE" value="Semana 13" />
+    <MESSAGE value="Semana 14" />
+    <option name="LAST_COMMIT_MESSAGE" value="Semana 14" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CharleyR$Dashboard.coverage" NAME="Dashboard Coverage Results" MODIFIED="1769971296601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
