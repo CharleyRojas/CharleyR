@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c1fffb4-9c93-433f-9807-30280f71e0a4" name="Changes" comment="Semana 14" />
+    <list default="true" id="1c1fffb4-9c93-433f-9807-30280f71e0a4" name="Changes" comment="Semana 15">
+      <change afterPath="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_16/atajos.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_16/semana 16.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -64,6 +68,8 @@
     "Python.ejemplo.executor": "Run",
     "Python.gestion.executor": "Run",
     "Python.semana 14.executor": "Run",
+    "Python.semana 15.executor": "Run",
+    "Python.semana 16.executor": "Run",
     "Python.semana 2.executor": "Run",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -129,6 +135,8 @@
       <workItem from="1773004141947" duration="2644000" />
       <workItem from="1773615165668" duration="592000" />
       <workItem from="1774230376275" duration="850000" />
+      <workItem from="1774803596209" duration="273000" />
+      <workItem from="1775357306278" duration="333000" />
     </task>
     <task id="LOCAL-00001" summary="Semana 2">
       <option name="closed" value="true" />
@@ -258,7 +266,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774231016365</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Semana 15">
+      <option name="closed" value="true" />
+      <created>1774803856716</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1774803856716</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -288,7 +304,8 @@
     <MESSAGE value="Semana 11" />
     <MESSAGE value="Semana 13" />
     <MESSAGE value="Semana 14" />
-    <option name="LAST_COMMIT_MESSAGE" value="Semana 14" />
+    <MESSAGE value="Semana 15" />
+    <option name="LAST_COMMIT_MESSAGE" value="Semana 15" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CharleyR$Dashboard.coverage" NAME="Dashboard Coverage Results" MODIFIED="1769971296601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -304,6 +321,7 @@
     <SUITE FILE_PATH="coverage/CharleyR$Semana_4.coverage" NAME="Semana 4 Coverage Results" MODIFIED="1766349321109" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana 4" />
     <SUITE FILE_PATH="coverage/CharleyR$Ejermplo.coverage" NAME="Ejermplo Coverage Results" MODIFIED="1769969841979" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_7" />
     <SUITE FILE_PATH="coverage/CharleyR$Semana_13.coverage" NAME="Semana 13 Coverage Results" MODIFIED="1773615228056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_13" />
+    <SUITE FILE_PATH="coverage/CharleyR$semana_15.coverage" NAME="semana 15 Coverage Results" MODIFIED="1774803753839" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_15" />
     <SUITE FILE_PATH="coverage/CharleyR$semana_14.coverage" NAME="semana 14 Coverage Results" MODIFIED="1774230583993" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_14" />
     <SUITE FILE_PATH="coverage/CharleyR$semana_2.coverage" NAME="semana 2 Coverage Results" MODIFIED="1765163631319" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2" />
     <SUITE FILE_PATH="coverage/CharleyR$Semana12.coverage" NAME="Semana12 Coverage Results" MODIFIED="1773005853213" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Semestre 2 Nuevo/semana_12" />

@@ -1,0 +1,9 @@
+El código cubre exactamente lo que pide la guía:
+
+Enter: Añade la tarea tras escribir en el input (<Return>).
+
+Tecla "C": Marca la tarea seleccionada como completada.
+
+Tecla "Delete" o "D": Elimina la tarea (configuré ambas para mayor comodidad).
+
+Tecla "Escape": Cierra la aplicación mediante root.destroy().
