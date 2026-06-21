@@ -1,0 +1,39 @@
+{
+    "vector": [
+        {
+            "nombre": "Charley Rojas",
+            "edad": 21,
+            "sintoma": "lele pancha"
+        },
+        {
+            "nombre": "lesly rojas",
+            "edad": 18,
+            "sintoma": "diarrea explosiva"
+        }
+    ],
+    "matriz": [
+        [
+            {
+                "nombre": "Charley Rojas",
+                "edad": 21,
+                "sintoma": "lele pancha"
+            },
+            null,
+            null
+        ],
+        [
+            {
+                "nombre": "lesly rojas",
+                "edad": 18,
+                "sintoma": "diarrea explosiva"
+            },
+            null,
+            null
+        ],
+        [
+            null,
+            null,
+            null
+        ]
+    ]
+}
