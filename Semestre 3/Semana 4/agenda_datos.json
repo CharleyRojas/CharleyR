@@ -1,0 +1,30 @@
+{
+    "vector": [
+        {
+            "nombre": "Charley Rojas",
+            "edad": 21,
+            "sintoma": "LELE PANCHITA"
+        }
+    ],
+    "matriz": [
+        [
+            null,
+            null,
+            null
+        ],
+        [
+            null,
+            null,
+            null
+        ],
+        [
+            {
+                "nombre": "Charley Rojas",
+                "edad": 21,
+                "sintoma": "LELE PANCHITA"
+            },
+            null,
+            null
+        ]
+    ]
+}
