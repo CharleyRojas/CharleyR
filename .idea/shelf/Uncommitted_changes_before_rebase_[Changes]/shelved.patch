@@ -1,0 +1,282 @@
+Index: Semestre 3/agenda telefonica/Agenda.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Semestre 3/agenda telefonica/Agenda.py b/Semestre 3/agenda telefonica/Agenda.py
+new file mode 100644
+--- /dev/null	(date 1782076030397)
++++ b/Semestre 3/agenda telefonica/Agenda.py	(date 1782076030397)
+@@ -0,0 +1,227 @@
++import tkinter as tk
++from tkinter import messagebox, ttk
++import json
++import os
++
++
++# 1. REGISTRO / ESTRUCTURA DE DATOS (POO)
++class Paciente:
++    def __init__(self, nombre, edad, sintoma):
++        self.nombre = nombre
++        self.edad = edad
++        self.sintoma = sintoma
++
++    def to_dict(self):
++        return {"nombre": self.nombre, "edad": self.edad, "sintoma": self.sintoma}
++
++    @staticmethod
++    def from_dict(data):
++        if data is None: return None
++        return Paciente(data["nombre"], data["edad"], data["sintoma"])
++
++
++# 2. CLASE DE GESTIÓN (Estructuras de Datos y Archivos)
++class GestionClinica:
++    def __init__(self):
++        self.archivo_datos = "agenda_datos.json"
++        self.horas = ["08:00", "09:00", "10:00"]
++        self.especialidades = ["General", "Pediatria", "Cardiologia"]
++
++        # VECTOR lineal de pacientes e historial
++        self.vector_pacientes = []
++        # MATRIZ bidimensional de turnos (3x3)
++        self.matriz_turnos = [[None for _ in range(3)] for _ in range(3)]
++
++        self.cargar_datos()
++
++    def agendar_turno(self, nombre, edad, sintoma, index_hora, index_esp):
++        if self.matriz_turnos[index_hora][index_esp] is not None:
++            return False, "Ese horario y especialidad ya están ocupados."
++
++        nuevo = Paciente(nombre, edad, sintoma)
++        self.vector_pacientes.append(nuevo)
++        self.matriz_turnos[index_hora][index_esp] = nuevo
++        self.guardar_datos()
++        return True, "Turno agendado con éxito."
++
++    def guardar_datos(self):
++        # Convertimos las estructuras de datos a un formato JSON compatible
++        matriz_serializada = []
++        for fila in self.matriz_turnos:
++            fila_serializada = [p.to_dict() if p else None for p in fila]
++            matriz_serializada.append(fila_serializada)
++
++        vector_serializado = [p.to_dict() for p in self.vector_pacientes]
++
++        datos = {
++            "vector": vector_serializado,
++            "matriz": matriz_serializada
++        }
++        with open(self.archivo_datos, "w") as f:
++            json.dump(datos, f, indent=4)
++
++    def cargar_datos(self):
++        if not os.path.exists(self.archivo_datos):
++            return  # Si no existe el archivo, inicia vacío
++
++        try:
++            with open(self.archivo_datos, "r") as f:
++                datos = json.load(f)
++
++            self.vector_pacientes = [Paciente.from_dict(p) for p in datos.get("vector", [])]
++
++            matriz_raw = datos.get("matriz", [])
++            for i in range(len(matriz_raw)):
++                for j in range(len(matriz_raw[i])):
++                    if matriz_raw[i][j]:
++                        self.matriz_turnos[i][j] = Paciente.from_dict(matriz_raw[i][j])
++        except Exception as e:
++            print("Error al cargar datos antiguos:", e)
++
++
++# 3. INTERFAZ GRÁFICA DE USUARIO (GUI)
++class AppClinica(tk.Tk):
++    def __init__(self):
++        super().__init__()
++        self.title("Sistema de Gestión Clínica - Semana 4")
++        self.geometry("750x600")
++        self.backend = GestionClinica()
++
++        self.crear_componentes()
++        self.actualizar_tabla_matriz()
++
++    def crear_componentes(self):
++        # --- Formulario de Registro ---
++        frame_form = tk.LabelFrame(self, text=" Registrar Nuevo Paciente y Turno ", padx=10, pady=10)
++        frame_form.pack(fill="x", padx=15, pady=10)
++
++        tk.Label(frame_form, text="Nombre:").grid(row=0, column=0, sticky="w", pady=2)
++        self.entry_nombre = tk.Entry(frame_form, width=30)
++        self.entry_nombre.grid(row=0, column=1, pady=2, padx=5)
++
++        tk.Label(frame_form, text="Edad:").grid(row=0, column=2, sticky="w", pady=2)
++        self.entry_edad = tk.Entry(frame_form, width=10)
++        self.entry_edad.grid(row=0, column=3, pady=2, padx=5)
++
++        tk.Label(frame_form, text="Síntoma:").grid(row=1, column=0, sticky="w", pady=2)
++        self.entry_sintoma = tk.Entry(frame_form, width=30)
++        self.entry_sintoma.grid(row=1, column=1, pady=2, padx=5)
++
++        tk.Label(frame_form, text="Hora:").grid(row=2, column=0, sticky="w", pady=5)
++        self.combo_hora = ttk.Combobox(frame_form, values=self.backend.horas, state="readonly", width=12)
++        self.combo_hora.grid(row=2, column=1, sticky="w", padx=5, pady=5)
++        self.combo_hora.current(0)
++
++        tk.Label(frame_form, text="Especialidad:").grid(row=2, column=2, sticky="w", pady=5)
++        self.combo_esp = ttk.Combobox(frame_form, values=self.backend.especialidades, state="readonly", width=15)
++        self.combo_esp.grid(row=2, column=3, sticky="w", padx=5, pady=5)
++        self.combo_esp.current(0)
++
++        btn_registrar = tk.Button(frame_form, text="Guardar y Agendar", bg="#4CAF50", fg="white",
++                                  command=self.procesar_registro)
++        btn_registrar.grid(row=2, column=4, padx=15, pady=5)
++
++        # --- SECCIÓN REPORTERÍA 1: VISUALIZAR MATRIZ ---
++        frame_matriz = tk.LabelFrame(self, text=" Reportería: Matriz de Turnos (Visualización General) ", padx=10,
++                                     pady=10)
++        frame_matriz.pack(fill="both", expand=True, padx=15, pady=5)
++
++        columnas = ("hora", "general", "pediatria", "cardiologia")
++        self.tabla_matriz = ttk.Treeview(frame_matriz, columns=columnas, show="headings", height=4)
++        self.tabla_matriz.heading("hora", text="Hora")
++        self.tabla_matriz.heading("general", text="General")
++        self.tabla_matriz.heading("pediatria", text="Pediatría")
++        self.tabla_matriz.heading("cardiologia", text="Cardiología")
++
++        self.tabla_matriz.column("hora", width=80, anchor="center")
++        self.tabla_matriz.column("general", width=180, anchor="center")
++        self.tabla_matriz.column("pediatria", width=180, anchor="center")
++        self.tabla_matriz.column("cardiologia", width=180, anchor="center")
++        self.tabla_matriz.pack(fill="both", expand=True)
++
++        # --- SECCIÓN REPORTERÍA 2: CONSULTAR ELEMENTO ---
++        frame_consulta = tk.LabelFrame(self, text=" Reportería: Consultar Registro Específico ", padx=10, pady=10)
++        frame_consulta.pack(fill="x", padx=15, pady=10)
++
++        tk.Label(frame_consulta, text="Buscar Paciente por Nombre:").pack(side="left", padx=5)
++        self.entry_buscar = tk.Entry(frame_consulta, width=25)
++        self.entry_buscar.pack(side="left", padx=5)
++
++        btn_buscar = tk.Button(frame_consulta, text="Consultar", bg="#008CBA", fg="white",
++                               command=self.procesar_consulta)
++        btn_buscar.pack(side="left", padx=5)
++
++    def actualizar_tabla_matriz(self):
++        # Limpiamos la tabla visual
++        for i in self.tabla_matriz.get_children():
++            self.tabla_matriz.delete(i)
++
++        # Rellenamos recorriendo la MATRIZ del backend
++        for i, hora in enumerate(self.backend.horas):
++            fila_valores = [hora]
++            for j in range(3):
++                paciente = self.backend.matriz_turnos[i][j]
++                if paciente:
++                    fila_valores.append(paciente.nombre)
++                else:
++                    fila_valores.append("[ Disponible ]")
++            self.tabla_matriz.insert("", "end", values=fila_valores)
++
++    def procesar_registro(self):
++        nombre = self.entry_nombre.get().strip()
++        sintoma = self.entry_sintoma.get().strip()
++
++        if not nombre or not sintoma or not self.entry_edad.get():
++            messagebox.showwarning("Campos Vacíos", "Por favor, llena todos los campos.")
++            return
++
++        try:
++            edad = int(self.entry_edad.get())
++        except ValueError:
++            messagebox.showerror("Error de Tipo", "La edad debe ser un número entero.")
++            return
++
++        idx_hora = self.combo_hora.current()
++        idx_esp = self.combo_esp.current()
++
++        exito, msg = self.backend.agendar_turno(nombre, edad, sintoma, idx_hora, idx_esp)
++
++        if exito:
++            messagebox.showinfo("Éxito", msg)
++            self.actualizar_tabla_matriz()
++            # Limpiar formulario
++            self.entry_nombre.delete(0, tk.END)
++            self.entry_edad.delete(0, tk.END)
++            self.entry_sintoma.delete(0, tk.END)
++        else:
++            messagebox.showerror("Error de Estructura", msg)
++
++    def procesar_consulta(self):
++        nombre_buscar = self.entry_buscar.get().strip().lower()
++        if not nombre_buscar:
++            messagebox.showwarning("Atención", "Escribe un nombre para buscar.")
++            return
++
++        encontrado = False
++        # Buscamos en el VECTOR de la estructura
++        for paciente in self.backend.vector_pacientes:
++            if paciente.nombre.lower() == nombre_buscar:
++                # Si lo encuentra, busca en qué celda de la MATRIZ quedó guardado
++                info_turno = "No asignado en matriz"
++                for f in range(3):
++                    for c in range(3):
++                        if self.backend.matriz_turnos[f][c] == paciente:
++                            info_turno = f"Hora: {self.backend.horas[f]} | Especialidad: {self.backend.especialidades[c]}"
++
++                detalles = f"Nombre: {paciente.nombre}\nEdad: {paciente.edad} años\nSíntoma: {paciente.sintoma}\n\nUbicación Estructura:\n{info_turno}"
++                messagebox.showinfo("Elemento Consultado", detalles)
++                encontrado = True
++                break
++
++        if not encontrado:
++            messagebox.showinfo("Resultado", "No se encontró ningún registro con ese nombre.")
++
++
++if __name__ == "__main__":
++    app = AppClinica()
++    app.mainloop()
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"1c1fffb4-9c93-433f-9807-30280f71e0a4\" name=\"Changes\" comment=\"Semana 15\">\r\n      <change afterPath=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_16/atajos.txt\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_16/semana 16.py\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"PUSH_AUTO_UPDATE\" value=\"true\" />\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;CharleyRojas&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/CharleyRojas/CharleyR.git&quot;,\r\n    &quot;accountId&quot;: &quot;f415a14c-aff0-4292-bee0-64f531145721&quot;\r\n  }\r\n}</component>\r\n  <component name=\"McpProjectServerCommands\">\r\n    <commands />\r\n    <urls />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 5\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"36XnUZ0jQoh5wBg0seZieLBnOCs\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"Python.Consola.executor\": \"Run\",\r\n    \"Python.Dashboard.executor\": \"Run\",\r\n    \"Python.Ejermplo.executor\": \"Run\",\r\n    \"Python.Gestión de Inventario.executor\": \"Run\",\r\n    \"Python.Hilos.executor\": \"Run\",\r\n    \"Python.Semana 13.executor\": \"Run\",\r\n    \"Python.Semana 3 POO.executor\": \"Run\",\r\n    \"Python.Semana 3 Tradicional.executor\": \"Run\",\r\n    \"Python.Semana 4.executor\": \"Run\",\r\n    \"Python.Semana 6.executor\": \"Run\",\r\n    \"Python.Semana 7.executor\": \"Run\",\r\n    \"Python.Semana12.executor\": \"Run\",\r\n    \"Python.Semana5.executor\": \"Run\",\r\n    \"Python.ejemplo.executor\": \"Run\",\r\n    \"Python.gestion.executor\": \"Run\",\r\n    \"Python.semana 14.executor\": \"Run\",\r\n    \"Python.semana 15.executor\": \"Run\",\r\n    \"Python.semana 16.executor\": \"Run\",\r\n    \"Python.semana 2.executor\": \"Run\",\r\n    \"RunOnceActivity.MCP Project settings loaded\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"RunOnceActivity.typescript.service.memoryLimit.init\": \"true\",\r\n    \"ai.playground.ignore.import.keys.banner.in.settings\": \"true\",\r\n    \"com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1\": \"true\",\r\n    \"git-widget-placeholder\": \"main\",\r\n    \"junie.onboarding.icon.badge.shown\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/CharleyR/PycharmProjects/CharleyR/Semestre 2 Nuevo/Semana_10\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"settings.editor.selected.configurable\": \"project.propVCSSupport.DirectoryMappings\",\r\n    \"to.speed.mode.migration.done\": \"true\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\CharleyR\\PycharmProjects\\CharleyR\\Semestre 2 Nuevo\\Semana_10\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\CharleyR\\PycharmProjects\\CharleyR\\Semestre 2 Nuevo\\Semana_2\" />\r\n      <recent name=\"C:\\Users\\CharleyR\\PycharmProjects\\CharleyR\\Semestre 2 Nuevo\" />\r\n      <recent name=\"C:\\Users\\CharleyR\\PycharmProjects\\CharleyR\" />\r\n      <recent name=\"C:\\Users\\CharleyR\\PycharmProjects\\CharleyR\\Semestre 1\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.31033.139\" />\r\n        <option value=\"bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"1c1fffb4-9c93-433f-9807-30280f71e0a4\" name=\"Changes\" comment=\"\" />\r\n      <created>1765161801961</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1765161801961</updated>\r\n      <workItem from=\"1765161814204\" duration=\"109000\" />\r\n      <workItem from=\"1765161934480\" duration=\"77000\" />\r\n      <workItem from=\"1765162044594\" duration=\"763000\" />\r\n      <workItem from=\"1765163045294\" duration=\"1342000\" />\r\n      <workItem from=\"1765732178035\" duration=\"611000\" />\r\n      <workItem from=\"1765733513319\" duration=\"133000\" />\r\n      <workItem from=\"1766349289699\" duration=\"599000\" />\r\n      <workItem from=\"1768152111599\" duration=\"387000\" />\r\n      <workItem from=\"1768751383702\" duration=\"1164000\" />\r\n      <workItem from=\"1769364524237\" duration=\"1623000\" />\r\n      <workItem from=\"1769969134291\" duration=\"257000\" />\r\n      <workItem from=\"1769969815444\" duration=\"173000\" />\r\n      <workItem from=\"1769970379987\" duration=\"956000\" />\r\n      <workItem from=\"1771089901278\" duration=\"738000\" />\r\n      <workItem from=\"1771681763905\" duration=\"642000\" />\r\n      <workItem from=\"1772293096113\" duration=\"1366000\" />\r\n      <workItem from=\"1773004141947\" duration=\"2644000\" />\r\n      <workItem from=\"1773615165668\" duration=\"592000\" />\r\n      <workItem from=\"1774230376275\" duration=\"850000\" />\r\n      <workItem from=\"1774803596209\" duration=\"273000\" />\r\n      <workItem from=\"1775357306278\" duration=\"333000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"Semana 2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1765163872900</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1765163872900</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Semana 2\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1765164239225</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1765164239225</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"Semana 3\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1765732588826</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1765732588826</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"Semana 4\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1766349548095</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1766349548095</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"Semana 4\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1766349590742</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1766349590742</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"Semana 4\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1766349872942</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1766349872942</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"Semana 5\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1768152355280</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1768152355280</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"Semana 6\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1768751934150</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1768751934150</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00009\" summary=\"Semana 7\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1769365916346</created>\r\n      <option name=\"number\" value=\"00009\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1769365916346</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00010\" summary=\"Semana 8\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1769971241522</created>\r\n      <option name=\"number\" value=\"00010\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00010\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1769971241522</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00011\" summary=\"Semana 9\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1771090219938</created>\r\n      <option name=\"number\" value=\"00011\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00011\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1771090219938</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00012\" summary=\"Semana 10\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1771682323890</created>\r\n      <option name=\"number\" value=\"00012\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00012\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1771682323890</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00013\" summary=\"Semana 11\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1772293872138</created>\r\n      <option name=\"number\" value=\"00013\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00013\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1772293872138</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00014\" summary=\"Semana 13\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1773615313431</created>\r\n      <option name=\"number\" value=\"00014\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00014\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1773615313431</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00015\" summary=\"Semana 13\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774230663276</created>\r\n      <option name=\"number\" value=\"00015\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00015\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774230663276</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00016\" summary=\"Semana 14\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774231016365</created>\r\n      <option name=\"number\" value=\"00016\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00016\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774231016365</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00017\" summary=\"Semana 15\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1774803856716</created>\r\n      <option name=\"number\" value=\"00017\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00017\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1774803856716</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"18\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"Semana 2\" />\r\n    <MESSAGE value=\"Semana 3\" />\r\n    <MESSAGE value=\"Semana 4\" />\r\n    <MESSAGE value=\"Semana 5\" />\r\n    <MESSAGE value=\"Semana 6\" />\r\n    <MESSAGE value=\"Semana 7\" />\r\n    <MESSAGE value=\"Semana 8\" />\r\n    <MESSAGE value=\"Semana 9\" />\r\n    <MESSAGE value=\"Semana 10\" />\r\n    <MESSAGE value=\"Semana 11\" />\r\n    <MESSAGE value=\"Semana 13\" />\r\n    <MESSAGE value=\"Semana 14\" />\r\n    <MESSAGE value=\"Semana 15\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Semana 15\" />\r\n  </component>\r\n  <component name=\"com.intellij.coverage.CoverageDataManagerImpl\">\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Dashboard.coverage\" NAME=\"Dashboard Coverage Results\" MODIFIED=\"1769971296601\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Hilos.coverage\" NAME=\"Hilos Coverage Results\" MODIFIED=\"1769970605308\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_7\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$gestion.coverage\" NAME=\"gestion Coverage Results\" MODIFIED=\"1772293638266\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_11\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Semana_6.coverage\" NAME=\"Semana 6 Coverage Results\" MODIFIED=\"1768751759785\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_6\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Consola.coverage\" NAME=\"Consola Coverage Results\" MODIFIED=\"1771682234257\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_10\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Gestión_de_Inventario.coverage\" NAME=\"Gestión de Inventario Coverage Results\" MODIFIED=\"1772293237938\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_11\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$ejemplo.coverage\" NAME=\"ejemplo Coverage Results\" MODIFIED=\"1765163560782\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2/PRACTICAS/semana02\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Semana_7.coverage\" NAME=\"Semana 7 Coverage Results\" MODIFIED=\"1769969175240\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_7\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Semana_3_POO.coverage\" NAME=\"Semana 3 POO Coverage Results\" MODIFIED=\"1765732463869\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_3\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Semana_3_Tradicional.coverage\" NAME=\"Semana 3 Tradicional Coverage Results\" MODIFIED=\"1765732366907\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_3\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Semana_4.coverage\" NAME=\"Semana 4 Coverage Results\" MODIFIED=\"1766349321109\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana 4\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Ejermplo.coverage\" NAME=\"Ejermplo Coverage Results\" MODIFIED=\"1769969841979\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_7\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Semana_13.coverage\" NAME=\"Semana 13 Coverage Results\" MODIFIED=\"1773615228056\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_13\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$semana_15.coverage\" NAME=\"semana 15 Coverage Results\" MODIFIED=\"1774803753839\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_15\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$semana_14.coverage\" NAME=\"semana 14 Coverage Results\" MODIFIED=\"1774230583993\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_14\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$semana_2.coverage\" NAME=\"semana 2 Coverage Results\" MODIFIED=\"1765163631319\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Semana12.coverage\" NAME=\"Semana12 Coverage Results\" MODIFIED=\"1773005853213\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/semana_12\" />\r\n    <SUITE FILE_PATH=\"coverage/CharleyR$Semana5.coverage\" NAME=\"Semana5 Coverage Results\" MODIFIED=\"1768152320101\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/Semestre 2 Nuevo/Semana_5\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 776a64c22bd08ff869fae67629dfc2c8a036e122)
++++ b/.idea/workspace.xml	(date 1782075993830)
+@@ -4,11 +4,7 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="1c1fffb4-9c93-433f-9807-30280f71e0a4" name="Changes" comment="Semana 15">
+-      <change afterPath="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_16/atajos.txt" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/Semestre 2 Nuevo/Semana_16/semana 16.py" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-    </list>
++    <list default="true" id="1c1fffb4-9c93-433f-9807-30280f71e0a4" name="Changes" comment="Semana 15" />
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -23,6 +19,11 @@
+   </component>
+   <component name="Git.Settings">
+     <option name="PUSH_AUTO_UPDATE" value="true" />
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="main" />
++      </map>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+   <component name="GitHubPullRequestSearchHistory">{
+@@ -77,7 +78,7 @@
+     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+     "ai.playground.ignore.import.keys.banner.in.settings": "true",
+     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+-    "git-widget-placeholder": "main",
++    "git-widget-placeholder": "776a64c2",
+     "junie.onboarding.icon.badge.shown": "true",
+     "last_opened_file_path": "C:/Users/CharleyR/PycharmProjects/CharleyR/Semestre 2 Nuevo/Semana_10",
+     "node.js.detected.package.eslint": "true",
